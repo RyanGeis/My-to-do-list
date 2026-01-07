@@ -427,7 +427,7 @@
         }
 
         function showForgotPassword() {
-            alert('Password reset email would be sent here.\n\nIn the full version, this would send a reset link to your email.');
+            showCustomAlert('Password reset email would be sent here.\n\nIn the full version, this would send a reset link to your email.');
         }
 
         function handleLogin(event) {
@@ -438,8 +438,9 @@
             localStorage.setItem('userEmail', email);
             localStorage.setItem('isLoggedIn', 'true');
             
-            alert('✅ Login successful!\n\nRedirecting to dashboard...');
-            window.location.href = 'index.html';
+            showCustomAlert('✅ Login successful!\n\nRedirecting to dashboard...', () => {
+                window.location.href = 'index.html';
+            });
         }
 
         function handleSignup(event) {
@@ -452,12 +453,13 @@
             localStorage.setItem('userEmail', email);
             localStorage.setItem('isLoggedIn', 'true');
             
-            alert('✅ Account created successfully!\n\nWelcome to Life Dashboard!');
-            window.location.href = 'index.html';
+            showCustomAlert('✅ Account created successfully!\n\nWelcome to Life Dashboard!', () => {
+                window.location.href = 'index.html';
+            });
         }
 
         function socialLogin(provider) {
-            alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login would connect here.\n\nIn the full version, this would use OAuth.`);
+            showCustomAlert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login would connect here.\n\nIn the full version, this would use OAuth.`);
         }
 
         function updateProfile(event) {
@@ -468,7 +470,7 @@
             localStorage.setItem('userName', name);
             localStorage.setItem('userEmail', email);
             
-            alert('✅ Profile updated successfully!');
+            showCustomAlert('✅ Profile updated successfully!');
         }
 
         function goToDashboard() {
@@ -476,11 +478,58 @@
         }
 
         function deleteAccount() {
-            if (confirm('⚠️ Are you sure? This will permanently delete your account and all data.\n\nThis cannot be undone.')) {
-                localStorage.clear();
-                alert('Account deleted. Goodbye! 👋');
-                showLogin();
-            }
+            showCustomConfirm(
+                '⚠️ Are you sure? This will permanently delete your account and all data.\n\nThis cannot be undone.',
+                () => {
+                    localStorage.clear();
+                    showCustomAlert('Account deleted. Goodbye! 👋', () => {
+                        showLogin();
+                    });
+                }
+            );
+        }
+
+        // Custom Alert Modal
+        function showCustomAlert(message, callback) {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px;';
+            modal.innerHTML = `
+                <div style="background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 30px; max-width: 400px; width: 100%; text-align: center;">
+                    <p style="color: #e0e0e0; line-height: 1.6; white-space: pre-line; margin-bottom: 25px;">${message}</p>
+                    <button onclick="handleAlertClose()" style="width: 100%; padding: 12px; background: #fff; color: #000; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">OK</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            window.handleAlertClose = () => {
+                modal.remove();
+                if (callback) callback();
+            };
+        }
+
+        // Custom Confirm Modal
+        function showCustomConfirm(message, onConfirm) {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px;';
+            modal.innerHTML = `
+                <div style="background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 30px; max-width: 400px; width: 100%; text-align: center;">
+                    <p style="color: #e0e0e0; line-height: 1.6; white-space: pre-line; margin-bottom: 25px;">${message}</p>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="handleConfirmCancel()" style="flex: 1; padding: 12px; background: #2a2a2a; color: #fff; border: 1px solid #3a3a3a; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancel</button>
+                        <button onclick="handleConfirmOk()" style="flex: 1; padding: 12px; background: #fff; color: #000; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Confirm</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            window.handleConfirmCancel = () => {
+                modal.remove();
+            };
+            
+            window.handleConfirmOk = () => {
+                modal.remove();
+                onConfirm();
+            };
         }
 
         if (window.location.search.includes('profile')) {
