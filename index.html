@@ -385,10 +385,47 @@
         }
 
         function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('isLoggedIn');
-                window.location.href = 'login.html';
-            }
+            showCustomConfirm(
+                'Are you sure you want to logout?',
+                () => {
+                    localStorage.removeItem('isLoggedIn');
+                    window.location.href = 'login.html';
+                }
+            );
+        }
+
+        // Custom Alert Modal
+        function showCustomAlert(message) {
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 400px; text-align: center;">
+                    <p style="color: #e0e0e0; line-height: 1.6; white-space: pre-line; margin-bottom: 25px;">${message}</p>
+                    <button class="btn" onclick="this.closest('.modal').remove()" style="width: 100%;">OK</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Custom Confirm Modal
+        function showCustomConfirm(message, onConfirm) {
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 400px; text-align: center;">
+                    <p style="color: #e0e0e0; line-height: 1.6; white-space: pre-line; margin-bottom: 25px;">${message}</p>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="this.closest('.modal').remove()" style="flex: 1;">Cancel</button>
+                        <button class="btn" onclick="handleConfirm()" style="flex: 1;">Confirm</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            window.handleConfirm = () => {
+                modal.remove();
+                onConfirm();
+            };
         }
 
         function checkDailyCheckIn() {
@@ -482,7 +519,7 @@
                 message = `✨ **A balanced day ahead**\n\nMood: ${mood}/10 | Energy: ${energy}/10 | Time: ${time}/10\n\nYou're in a good middle ground. Tackle your priorities with a balanced approach.`;
             }
             
-            alert(message);
+            showCustomAlert(message);
             closeWelcome();
         }
 
@@ -532,10 +569,10 @@
                 });
                 localStorage.setItem('taskExcuses', JSON.stringify(excuses));
                 
-                alert('✅ Tasks removed and reasons saved.\n\n📅 Remember: You\'ll review these in your monthly summary to see if these excuses are worth it!');
+                showCustomAlert('✅ Tasks removed and reasons saved.\n\n📅 Remember: You\'ll review these in your monthly summary to see if these excuses are worth it!');
                 closeWelcome();
             } else {
-                alert('Please fill in both fields to continue.');
+                showCustomAlert('Please fill in both fields to continue.');
             }
         }
 
@@ -547,10 +584,10 @@
             const priorities = document.getElementById('priorities').value;
             if (priorities.trim()) {
                 localStorage.setItem('lastCheckIn', new Date().toDateString());
-                alert('Priorities saved! Let\'s get started on your journey 🎉');
+                showCustomAlert('Priorities saved! Let\'s get started on your journey 🎉');
                 closeWelcome();
             } else {
-                alert('Please write at least one priority to get started!');
+                showCustomAlert('Please write at least one priority to get started!');
             }
         }
 
@@ -560,15 +597,24 @@
                 return;
             }
             
-            const messages = {
-                'goals': 'Goals section - Here you can set and track your aspirations!',
-                'todo': 'To-Do List - Manage your daily tasks with priorities and deadlines!',
-                'projects': 'Projects - Track larger initiatives with calendar and progress bars!',
-                'finances': 'Finances - Budget tracker with linked bank integration and spending insights!',
-                'meal': 'Meal Planning - Plan your weekly meals with vegetarian/non-vegetarian cycles!',
-                'reflection': 'Weekly Reflection - Answer questions and see your feelings over time!'
+            // Navigate to actual pages
+            const pages = {
+                'goals': 'goals.html',
+                'todo': 'todo.html',
+                'projects': 'projects.html',
+                'finances': 'finances.html',
+                'meal': 'meals.html',
+                'reflection': 'reflection.html'
             };
-            alert(messages[section] + '\n\n(This would navigate to a dedicated page in the full version)');
+            
+            if (pages[section]) {
+                // Check if page exists, otherwise show coming soon
+                if (section === 'goals') {
+                    window.location.href = pages[section];
+                } else {
+                    showCustomAlert(`${section.charAt(0).toUpperCase() + section.slice(1)} page coming soon!\n\nThis feature is being built.`);
+                }
+            }
         }
 
         function showMonthlyReview() {
@@ -638,19 +684,22 @@
                 });
                 localStorage.setItem('monthlyReviews', JSON.stringify(reviews));
                 
-                alert('✅ Monthly review saved! Your new goals and values are set for next month.');
+                showCustomAlert('✅ Monthly review saved! Your new goals and values are set for next month.');
                 closeWelcome();
             } else {
-                alert('Please fill in both fields to complete your monthly review.');
+                showCustomAlert('Please fill in both fields to complete your monthly review.');
             }
         }
 
         function clearExcuses() {
-            if (confirm('Are you sure you want to clear your excuse history? This cannot be undone.')) {
-                localStorage.setItem('taskExcuses', '[]');
-                alert('✅ Excuse history cleared. Fresh start!');
-                showMonthlyReview();
-            }
+            showCustomConfirm(
+                'Are you sure you want to clear your excuse history? This cannot be undone.',
+                () => {
+                    localStorage.setItem('taskExcuses', '[]');
+                    showCustomAlert('✅ Excuse history cleared. Fresh start!');
+                    showMonthlyReview();
+                }
+            );
         }
 
         window.onload = function() {
