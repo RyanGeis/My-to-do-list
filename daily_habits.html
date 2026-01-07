@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Habits - Life Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #fff;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #e0e0e0;
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #3a3a3a;
+        }
+
+        .btn-secondary:hover {
+            background: #3a3a3a;
+        }
+
+        .week-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            background: #1a1a1a;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .week-nav {
+            background: #2a2a2a;
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .week-nav:hover {
+            background: #3a3a3a;
+        }
+
+        .week-display {
+            flex: 1;
+            text-align: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .habit-grid {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        th {
+            background: #0a0a0a;
+            color: #fff;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th:first-child {
+            text-align: left;
+            padding-left: 20px;
+        }
+
+        td:first-child {
+            text-align: left;
+            padding-left: 20px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .habit-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .delete-habit {
+            background: #2a2a2a;
+            border: none;
+            color: #999;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        tr:hover .delete-habit {
+            opacity: 1;
+        }
+
+        .delete-habit:hover {
+            background: #ff4444;
+            color: #fff;
+        }
+
+        input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #fff;
+        }
+
+        .day-header {
+            font-size: 0.9em;
+        }
+
+        .day-name {
+            display: block;
+            font-weight: 600;
+        }
+
+        .day-date {
+            display: block;
+            color: #999;
+            font-size: 0.85em;
+            font-weight: 400;
+        }
+
+        .add-habit-row {
+            background: #0a0a0a;
+        }
+
+        .add-habit-row td {
+            padding: 20px;
+        }
+
+        .add-habit-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px 15px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 1em;
+        }
+
+        .add-habit-input:focus {
+            outline: none;
+            border-color: #fff;
+        }
+
+        .analytics-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .analytics-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 25px;
+        }
+
+        .analytics-card h3 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .circle-chart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: conic-gradient(#4CAF50 0deg, #4CAF50 var(--progress), #2a2a2a var(--progress), #2a2a2a 360deg);
+        }
+
+        .circle-inner {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .circle-percent {
+            font-size: 2em;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .circle-label {
+            font-size: 0.8em;
+            color: #999;
+        }
+
+        .bar-chart {
+            margin-top: 20px;
+        }
+
+        .bar-item {
+            margin-bottom: 15px;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .bar-name {
+            color: #fff;
+        }
+
+        .bar-value {
+            color: #999;
+        }
+
+        .bar-track {
+            width: 100%;
+            height: 8px;
+            background: #0a0a0a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @media (max-width: 768px) {
+            .analytics-section {
+                grid-template-columns: 1fr;
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 0.9em;
+            }
+
+            input[type="checkbox"] {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✓ Daily Habits</h1>
+            <div class="header-actions">
+                <a href="index.html" class="btn btn-secondary">← Dashboard</a>
+            </div>
+        </header>
+
+        <div class="week-selector">
+            <button class="week-nav" onclick="changeWeek(-1)">← Previous</button>
+            <div class="week-display" id="weekDisplay">This Week</div>
+            <button class="week-nav" onclick="changeWeek(1)">Next →</button>
+        </div>
+
+        <div class="habit-grid">
+            <table id="habitTable">
+                <thead>
+                    <tr id="dayHeaders">
+                        <th>Habit</th>
+                    </tr>
+                </thead>
+                <tbody id="habitRows">
+                    <tr class="add-habit-row">
+                        <td colspan="8">
+                            <input type="text" class="add-habit-input" id="newHabitInput" placeholder="+ Add new habit..." onkeypress="handleAddHabit(event)">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="analytics-section">
+            <div class="analytics-card">
+                <h3>📊 This Week's Progress</h3>
+                <div class="circle-chart">
+                    <div class="circle" id="weekCircle">
+                        <div class="circle-inner">
+                            <div class="circle-percent" id="weekPercent">0%</div>
+                            <div class="circle-label">Complete</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analytics-card">
+                <h3>📈 Habit Performance</h3>
+                <div class="bar-chart" id="habitBars">
+                    <div class="empty-state">
+                        <p>Add habits to see performance</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+
+        let currentWeekOffset = 0;
+        let habits = JSON.parse(localStorage.getItem('habits') || '[]');
+        let habitChecks = JSON.parse(localStorage.getItem('habitChecks') || '{}');
+
+        function getWeekDates(offset = 0) {
+            const today = new Date();
+            today.setDate(today.getDate() + (offset * 7));
+            
+            const day = today.getDay();
+            const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+            
+            const monday = new Date(today.setDate(diff));
+            const dates = [];
+            
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(monday);
+                date.setDate(monday.getDate() + i);
+                dates.push(date);
+            }
+            
+            return dates;
+        }
+
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function renderHeaders() {
+            const dates = getWeekDates(currentWeekOffset);
+            const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            
+            const headers = dates.map((date, i) => {
+                const isToday = formatDate(date) === formatDate(new Date());
+                return `
+                    <th class="day-header" style="${isToday ? 'background: #2a2a2a;' : ''}">
+                        <span class="day-name">${dayNames[i]}</span>
+                        <span class="day-date">${date.getDate()}</span>
+                    </th>
+                `;
+            }).join('');
+            
+            document.getElementById('dayHeaders').innerHTML = `<th>Habit</th>${headers}`;
+            
+            const firstDate = dates[0];
+            const lastDate = dates[6];
+            const monthName = firstDate.toLocaleString('default', { month: 'short' });
+            document.getElementById('weekDisplay').textContent = 
+                `${monthName} ${firstDate.getDate()} - ${lastDate.getDate()}, ${firstDate.getFullYear()}`;
+        }
+
+        function renderHabits() {
+            const dates = getWeekDates(currentWeekOffset);
+            const tbody = document.getElementById('habitRows');
+            
+            if (habits.length === 0) {
+                tbody.innerHTML = `
+                    <tr class="add-habit-row">
+                        <td colspan="8">
+                            <input type="text" class="add-habit-input" id="newHabitInput" placeholder="+ Add new habit..." onkeypress="handleAddHabit(event)">
+                        </td>
+                    </tr>
+                `;
+                renderAnalytics();
+                return;
+            }
+            
+            const rows = habits.map(habit => {
+                const checkboxes = dates.map(date => {
+                    const dateStr = formatDate(date);
+                    const checkKey = `${habit.id}_${dateStr}`;
+                    const isChecked = habitChecks[checkKey] || false;
+                    
+                    return `<td><input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleCheck('${habit.id}', '${dateStr}')"></td>`;
+                }).join('');
+                
+                return `
+                    <tr>
+                        <td>
+                            <div class="habit-name">
+                                ${habit.name}
+                                <button class="delete-habit" onclick="deleteHabit('${habit.id}')">Delete</button>
+                            </div>
+                        </td>
+                        ${checkboxes}
+                    </tr>
+                `;
+            }).join('');
+            
+            tbody.innerHTML = rows + `
+                <tr class="add-habit-row">
+                    <td colspan="8">
+                        <input type="text" class="add-habit-input" id="newHabitInput" placeholder="+ Add new habit..." onkeypress="handleAddHabit(event)">
+                    </td>
+                </tr>
+            `;
+            
+            renderAnalytics();
+        }
+
+        function handleAddHabit(event) {
+            if (event.key === 'Enter') {
+                const input = event.target;
+                const name = input.value.trim();
+                
+                if (name) {
+                    habits.push({
+                        id: Date.now().toString(),
+                        name: name,
+                        createdAt: new Date().toISOString()
+                    });
+                    
+                    localStorage.setItem('habits', JSON.stringify(habits));
+                    input.value = '';
+                    renderHabits();
+                }
+            }
+        }
+
+        function toggleCheck(habitId, dateStr) {
+            const checkKey = `${habitId}_${dateStr}`;
+            habitChecks[checkKey] = !habitChecks[checkKey];
+            
+            if (!habitChecks[checkKey]) {
+                delete habitChecks[checkKey];
+            }
+            
+            localStorage.setItem('habitChecks', JSON.stringify(habitChecks));
+            renderAnalytics();
+        }
+
+        function deleteHabit(habitId) {
+            showCustomConfirm('Delete this habit? All check data will be lost.', () => {
+                habits = habits.filter(h => h.id !== habitId);
+                
+                Object.keys(habitChecks).forEach(key => {
+                    if (key.startsWith(habitId + '_')) {
+                        delete habitChecks[key];
+                    }
+                });
+                
+                localStorage.setItem('habits', JSON.stringify(habits));
+                localStorage.setItem('habitChecks', JSON.stringify(habitChecks));
+                renderHabits();
+            });
+        }
+
+        function renderAnalytics() {
+            const dates = getWeekDates(currentWeekOffset);
+            
+            let totalPossible = habits.length * 7;
+            let totalCompleted = 0;
+            
+            dates.forEach(date => {
+                const dateStr = formatDate(date);
+                habits.forEach(habit => {
+                    const checkKey = `${habit.id}_${dateStr}`;
+                    if (habitChecks[checkKey]) {
+                        totalCompleted++;
+                    }
+                });
+            });
+            
+            const weekPercent = totalPossible > 0 ? Math.round((totalCompleted / totalPossible) * 100) : 0;
+            
+            const circle = document.getElementById('weekCircle');
+            const percentText = document.getElementById('weekPercent');
+            
+            circle.style.setProperty('--progress', `${weekPercent * 3.6}deg`);
+            percentText.textContent = `${weekPercent}%`;
+            
+            const habitBars = document.getElementById('habitBars');
+            
+            if (habits.length === 0) {
+                habitBars.innerHTML = '<div class="empty-state"><p>Add habits to see performance</p></div>';
+                return;
+            }
+            
+            const habitStats = habits.map(habit => {
+                let completed = 0;
+                dates.forEach(date => {
+                    const dateStr = formatDate(date);
+                    const checkKey = `${habit.id}_${dateStr}`;
+                    if (habitChecks[checkKey]) completed++;
+                });
+                
+                return {
+                    name: habit.name,
+                    completed: completed,
+                    total: 7,
+                    percent: Math.round((completed / 7) * 100)
+                };
+            });
+            
+            habitBars.innerHTML = habitStats.map(stat => `
+                <div class="bar-item">
+                    <div class="bar-label">
+                        <span class="bar-name">${stat.name}</span>
+                        <span class="bar-value">${stat.completed}/7</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width: ${stat.percent}%"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function changeWeek(direction) {
+            currentWeekOffset += direction;
+            renderHeaders();
+            renderHabits();
+        }
+
+        function showCustomConfirm(message, onConfirm) {
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div style="background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 30px; max-width: 400px; width: 100%; text-align: center;">
+                    <p style="color: #e0e0e0; line-height: 1.6; margin-bottom: 25px;">${message}</p>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="this.closest('.modal').remove()" style="flex: 1; padding: 12px; background: #2a2a2a; color: #fff; border: 1px solid #3a3a3a; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancel</button>
+                        <button onclick="handleConfirmAction()" style="flex: 1; padding: 12px; background: #fff; color: #000; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Confirm</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            window.handleConfirmAction = () => {
+                modal.remove();
+                onConfirm();
+            };
+        }
+
+        renderHeaders();
+        renderHabits();
+    </script>
+</body>
+</html>
