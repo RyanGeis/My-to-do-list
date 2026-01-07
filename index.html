@@ -339,8 +339,13 @@
                 <p>Short and long-term goals with milestones</p>
             </div>
 
+            <div class="card" onclick="openSection('habits')">
+                <h2><span class="card-icon">✓</span> Daily Habits</h2>
+                <p>Track daily habits with visual progress</p>
+            </div>
+
             <div class="card" onclick="openSection('todo')">
-                <h2><span class="card-icon">✓</span> To-Do</h2>
+                <h2><span class="card-icon">📋</span> To-Do</h2>
                 <p>Daily tasks with progress tracking</p>
             </div>
 
@@ -600,6 +605,7 @@
             // Navigate to actual pages
             const pages = {
                 'goals': 'goals.html',
+                'habits': 'daily-habits.html',
                 'todo': 'todo.html',
                 'projects': 'projects.html',
                 'finances': 'finances.html',
@@ -609,7 +615,7 @@
             
             if (pages[section]) {
                 // Check if page exists, otherwise show coming soon
-                if (section === 'goals') {
+                if (section === 'goals' || section === 'habits') {
                     window.location.href = pages[section];
                 } else {
                     showCustomAlert(`${section.charAt(0).toUpperCase() + section.slice(1)} page coming soon!\n\nThis feature is being built.`);
