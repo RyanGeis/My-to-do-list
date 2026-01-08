@@ -615,7 +615,7 @@
             
             if (pages[section]) {
                 // Check if page exists, otherwise show coming soon
-                if (section === 'goals' || section === 'habits') {
+                if (section === 'goals' || section === 'habits' || section === 'finances') {
                     window.location.href = pages[section];
                 } else {
                     showCustomAlert(`${section.charAt(0).toUpperCase() + section.slice(1)} page coming soon!\n\nThis feature is being built.`);
