@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cash Flow - Life Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #fff;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #3a3a3a;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .nav-tab {
+            padding: 10px 20px;
+            background: #1a1a1a;
+            color: #999;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-tab.active {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+
+        .nav-tab:hover {
+            border-color: #fff;
+            color: #fff;
+        }
+
+        .card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card h2 {
+            color: #fff;
+            margin-bottom: 25px;
+            font-size: 1.3em;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            text-align: center;
+            padding: 20px;
+            background: #0a0a0a;
+            border-radius: 8px;
+        }
+
+        .summary-label {
+            color: #999;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .summary-value {
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+
+        .summary-value.positive {
+            color: #4CAF50;
+        }
+
+        .summary-value.negative {
+            color: #ff4444;
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+            margin: 30px 0;
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        th {
+            background: #0a0a0a;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        td {
+            color: #e0e0e0;
+        }
+
+        .percent-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 8px;
+            background: #0a0a0a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            border-radius: 4px;
+        }
+
+        .comparison-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .comparison-column h3 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .comparison-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #0a0a0a;
+            border-radius: 6px;
+        }
+
+        .comparison-label {
+            color: #e0e0e0;
+        }
+
+        .comparison-value {
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-good {
+            background: #4CAF50;
+            color: #fff;
+        }
+
+        .status-warning {
+            background: #ff8800;
+            color: #fff;
+        }
+
+        .status-bad {
+            background: #ff4444;
+            color: #fff;
+        }
+
+        @media (max-width: 968px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Finances</h1>
+            <a href="index.html" class="btn btn-secondary">← Dashboard</a>
+        </header>
+
+        <div class="nav-tabs">
+            <a href="finances.html" class="nav-tab">Overview</a>
+            <a href="finance-cashflow.html" class="nav-tab active">Cash Flow</a>
+            <a href="finance-budget.html" class="nav-tab">Budget</a>
+        </div>
+
+        <div class="card">
+            <h2>📊 Monthly Cash Flow</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-label">Income</div>
+                    <div class="summary-value positive" id="totalIncome">$0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Expenses</div>
+                    <div class="summary-value negative" id="totalExpenses">$0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Net</div>
+                    <div class="summary-value" id="netAmount">$0</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="cashflowChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📈 Category Breakdown</h2>
+            <table id="categoryTable">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>% of Total</th>
+                        <th style="width: 200px;">Distribution</th>
+                    </tr>
+                </thead>
+                <tbody id="categoryTableBody">
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 40px; color: #666;">
+                            No expenses this month
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>💡 What Should It Look Like?</h2>
+            <p style="color: #999; margin-bottom: 30px;">
+                Based on your income of <span id="incomeDisplay" style="color: #fff; font-weight: 600;">$0</span>/month
+            </p>
+
+            <div class="comparison-section">
+                <div class="comparison-column">
+                    <h3>Recommended Budget Split</h3>
+                    <div id="recommendedList"></div>
+                </div>
+
+                <div class="comparison-column">
+                    <h3>Your Actual Spending</h3>
+                    <div id="actualList"></div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; padding: 20px; background: #0a0a0a; border-radius: 8px;">
+                <h3 style="color: #fff; margin-bottom: 15px;">Financial Health Score: <span id="healthScore">0</span>/100</h3>
+                <div class="bar-track" style="height: 12px;">
+                    <div class="bar-fill" id="healthBar" style="width: 0%;"></div>
+                </div>
+                <p id="healthAdvice" style="color: #999; margin-top: 15px; font-size: 0.9em;"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+
+        let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+        let budgetPhilosophy = JSON.parse(localStorage.getItem('budgetPhilosophy') || '{"type": "balanced"}');
+
+        const philosophies = {
+            aggressive: { savings: 35, housing: 30, food: 12, transport: 10, fun: 8, other: 5 },
+            balanced: { savings: 20, housing: 30, food: 15, transport: 12, fun: 10, other: 13 },
+            enjoyLife: { savings: 10, housing: 30, food: 15, transport: 12, fun: 20, other: 13 }
+        };
+
+        function getCurrentMonthData() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            return transactions.filter(t => {
+                const tDate = new Date(t.date);
+                return tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear;
+            });
+        }
+
+        function calculateTotals(monthTransactions) {
+            let income = 0;
+            let expenses = 0;
+            const categoryTotals = {};
+
+            monthTransactions.forEach(t => {
+                if (t.type === 'income') {
+                    income += t.amount;
+                } else {
+                    expenses += t.amount;
+                    categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount;
+                }
+            });
+
+            return { income, expenses, net: income - expenses, categoryTotals };
+        }
+
+        function renderSummary() {
+            const monthTransactions = getCurrentMonthData();
+            const { income, expenses, net } = calculateTotals(monthTransactions);
+
+            document.getElementById('totalIncome').textContent = `$${income.toFixed(2)}`;
+            document.getElementById('totalExpenses').textContent = `$${expenses.toFixed(2)}`;
+            document.getElementById('netAmount').textContent = `$${net.toFixed(2)}`;
+            document.getElementById('incomeDisplay').textContent = `$${income.toFixed(2)}`;
+
+            const netElement = document.getElementById('netAmount');
+            netElement.className = 'summary-value ' + (net >= 0 ? 'positive' : 'negative');
+
+            return { income, expenses, net, monthTransactions };
+        }
+
+        function renderCategoryTable() {
+            const monthTransactions = getCurrentMonthData();
+            const { categoryTotals } = calculateTotals(monthTransactions);
+            
+            const total = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
+            
+            if (total === 0) {
+                document.getElementById('categoryTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 40px; color: #666;">
+                            No expenses this month
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const categoryNames = {
+                food: '🍔 Food & Dining',
+                transport: '🚗 Transportation',
+                housing: '🏠 Housing',
+                entertainment: '🎉 Entertainment',
+                shopping: '🛍️ Shopping',
+                subscriptions: '💳 Subscriptions',
+                education: '📚 Education',
+                other: '💼 Other'
+            };
+
+            const rows = Object.entries(categoryTotals)
+                .sort((a, b) => b[1] - a[1])
+                .map(([category, amount]) => {
+                    const percent = ((amount / total) * 100).toFixed(1);
+                    return `
+                        <tr>
+                            <td>${categoryNames[category] || category}</td>
+                            <td style="font-weight: 600;">$${amount.toFixed(2)}</td>
+                            <td>${percent}%</td>
+                            <td>
+                                <div class="percent-bar">
+                                    <div class="bar-track">
+                                        <div class="bar-fill" style="width: ${percent}%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            document.getElementById('categoryTableBody').innerHTML = rows;
+        }
+
+        function renderComparison() {
+            const { income, categoryTotals } = calculateTotals(getCurrentMonthData());
+            
+            if (income === 0) {
+                document.getElementById('recommendedList').innerHTML = '<p style="color: #666;">Add income transactions to see recommendations</p>';
+                document.getElementById('actualList').innerHTML = '<p style="color: #666;">No spending data yet</p>';
+                return;
+            }
+
+            const philosophy = philosophies[budgetPhilosophy.type || 'balanced'];
+            
+            const categoryMap = {
+                housing: 'housing',
+                food: 'food',
+                transport: 'transport',
+                entertainment: 'fun',
+                shopping: 'fun',
+                subscriptions: 'other',
+                education: 'other',
+                other: 'other'
+            };
+
+            const actualGrouped = {
+                housing: 0,
+                food: 0,
+                transport: 0,
+                fun: 0,
+                other: 0
+            };
+
+            Object.entries(categoryTotals).forEach(([cat, amount]) => {
+                const group = categoryMap[cat] || 'other';
+                actualGrouped[group] += amount;
+            });
+
+            const actualSavings = income - Object.values(actualGrouped).reduce((a, b) => a + b, 0);
+
+            const recommended = {
+                'Housing': { amount: income * (philosophy.housing / 100), percent: philosophy.housing },
+                'Food': { amount: income * (philosophy.food / 100), percent: philosophy.food },
+                'Transport': { amount: income * (philosophy.transport / 100), percent: philosophy.transport },
+                'Fun': { amount: income * (philosophy.fun / 100), percent: philosophy.fun },
+                'Savings': { amount: income * (philosophy.savings / 100), percent: philosophy.savings },
+                'Other': { amount: income * (philosophy.other / 100), percent: philosophy.other }
+            };
+
+            const actual = {
+                'Housing': { amount: actualGrouped.housing, percent: (actualGrouped.housing / income) * 100 },
+                'Food': { amount: actualGrouped.food, percent: (actualGrouped.food / income) * 100 },
+                'Transport': { amount: actualGrouped.transport, percent: (actualGrouped.transport / income) * 100 },
+                'Fun': { amount: actualGrouped.fun, percent: (actualGrouped.fun / income) * 100 },
+                'Savings': { amount: actualSavings, percent: (actualSavings / income) * 100 },
+                'Other': { amount: actualGrouped.other, percent: (actualGrouped.other / income) * 100 }
+            };
+
+            document.getElementById('recommendedList').innerHTML = Object.entries(recommended).map(([name, data]) => `
+                <div class="comparison-item">
+                    <span class="comparison-label">${name}</span>
+                    <span class="comparison-value">$${data.amount.toFixed(0)} (${data.percent}%)</span>
+                </div>
+            `).join('');
+
+            document.getElementById('actualList').innerHTML = Object.entries(actual).map(([name, data]) => {
+                const recommended = Object.values(recommended).find(r => r.percent === philosophy[name.toLowerCase()]);
+                const diff = recommended ? data.percent - recommended.percent : 0;
+                
+                let status = '';
+                if (name === 'Savings') {
+                    status = diff >= 0 ? '<span class="status-badge status-good">✓ Great</span>' : 
+                             diff > -10 ? '<span class="status-badge status-warning">⚠ Low</span>' :
+                             '<span class="status-badge status-bad">✗ Poor</span>';
+                } else {
+                    status = Math.abs(diff) < 5 ? '<span class="status-badge status-good">✓ On track</span>' :
+                             diff > 0 ? '<span class="status-badge status-warning">⚠ High</span>' :
+                             '<span class="status-badge status-good">✓ Good</span>';
+                }
+                
+                return `
+                    <div class="comparison-item">
+                        <span class="comparison-label">${name}</span>
+                        <span class="comparison-value">$${data.amount.toFixed(0)} (${data.percent.toFixed(0)}%)${status}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // Calculate health score
+            let score = 50; // Base score
+            
+            if (actualSavings >= income * 0.20) score += 20;
+            else if (actualSavings >= income * 0.10) score += 10;
+            else if (actualSavings < 0) score -= 20;
+            
+            if (actualGrouped.housing <= income * 0.35) score += 10;
+            if (actualGrouped.food <= income * 0.20) score += 10;
+            if (actualSavings > 0) score += 10;
+            
+            score = Math.max(0, Math.min(100, score));
+            
+            document.getElementById('healthScore').textContent = score;
+            document.getElementById('healthBar').style.width = score + '%';
+            
+            let advice = '';
+            if (score >= 80) advice = '🎉 Excellent! Your finances are in great shape.';
+            else if (score >= 60) advice = '✓ Good job! A few tweaks could improve your financial health.';
+            else if (score >= 40) advice = '⚠️ Consider adjusting your spending in a few categories.';
+            else advice = '⚠️ Your spending needs attention. Focus on saving more and reducing expenses.';
+            
+            document.getElementById('healthAdvice').textContent = advice;
+        }
+
+        renderSummary();
+        renderCategoryTable();
+        renderComparison();
+    </script>
+</body>
+</html>
