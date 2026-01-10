@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget - Life Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #fff;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-secondary {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #3a3a3a;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .nav-tab {
+            padding: 10px 20px;
+            background: #1a1a1a;
+            color: #999;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-tab.active {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+
+        .nav-tab:hover {
+            border-color: #fff;
+            color: #fff;
+        }
+
+        .philosophy-selector {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .philosophy-selector h2 {
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .philosophy-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .philosophy-option {
+            padding: 20px;
+            background: #0a0a0a;
+            border: 2px solid #2a2a2a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .philosophy-option:hover {
+            border-color: #fff;
+        }
+
+        .philosophy-option.selected {
+            border-color: #4CAF50;
+            background: #1a2a1a;
+        }
+
+        .philosophy-name {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .philosophy-desc {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .budget-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .budget-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 25px;
+        }
+
+        .budget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .budget-title {
+            font-size: 1.2em;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .budget-status {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-safe {
+            background: #4CAF50;
+            color: #fff;
+        }
+
+        .status-warning {
+            background: #ff8800;
+            color: #fff;
+        }
+
+        .status-danger {
+            background: #ff4444;
+            color: #fff;
+        }
+
+        .budget-amounts {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #0a0a0a;
+            border-radius: 6px;
+        }
+
+        .amount-item {
+            text-align: center;
+        }
+
+        .amount-label {
+            color: #999;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .amount-value {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #0a0a0a;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            transition: width 0.3s;
+            border-radius: 6px;
+        }
+
+        .progress-safe {
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+        }
+
+        .progress-warning {
+            background: linear-gradient(90deg, #ff8800, #ffbb00);
+        }
+
+        .progress-danger {
+            background: linear-gradient(90deg, #ff4444, #ff8800);
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .philosophy-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Finances</h1>
+            <a href="index.html" class="btn btn-secondary">← Dashboard</a>
+        </header>
+
+        <div class="nav-tabs">
+            <a href="finances.html" class="nav-tab">Overview</a>
+            <a href="finance-cashflow.html" class="nav-tab">Cash Flow</a>
+            <a href="finance-budget.html" class="nav-tab active">Budget</a>
+        </div>
+
+        <div class="philosophy-selector">
+            <h2>💭 Your Budget Philosophy</h2>
+            <p style="color: #999; margin-bottom: 25px;">Choose your savings priority and spending approach</p>
+            
+            <div class="philosophy-options">
+                <div class="philosophy-option" onclick="selectPhilosophy('aggressive')">
+                    <div class="philosophy-name">📈 Aggressive Saver</div>
+                    <div class="philosophy-desc">35% savings - Maximum financial growth</div>
+                </div>
+
+                <div class="philosophy-option selected" onclick="selectPhilosophy('balanced')">
+                    <div class="philosophy-name">💰 Balanced</div>
+                    <div class="philosophy-desc">20% savings - Healthy balance</div>
+                </div>
+
+                <div class="philosophy-option" onclick="selectPhilosophy('enjoyLife')">
+                    <div class="philosophy-name">🎉 Enjoy Life</div>
+                    <div class="philosophy-desc">10% savings - Live for today</div>
+                </div>
+            </div>
+
+            <button class="btn" onclick="savePhilosophy()">Save Philosophy</button>
+        </div>
+
+        <div class="budget-grid" id="budgetGrid">
+            <!-- Budget cards will be generated here -->
+        </div>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+
+        let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+        let budgetPhilosophy = JSON.parse(localStorage.getItem('budgetPhilosophy') || '{"type": "balanced"}');
+
+        const philosophies = {
+            aggressive: { 
+                savings: 35, housing: 30, food: 12, transport: 10, fun: 8, other: 5,
+                description: "Maximum savings for future goals"
+            },
+            balanced: { 
+                savings: 20, housing: 30, food: 15, transport: 12, fun: 10, other: 13,
+                description: "Healthy balance between saving and spending"
+            },
+            enjoyLife: { 
+                savings: 10, housing: 30, food: 15, transport: 12, fun: 20, other: 13,
+                description: "Prioritize experiences and enjoyment"
+            }
+        };
+
+        const categoryInfo = {
+            housing: { icon: '🏠', name: 'Housing', desc: 'Rent, utilities, maintenance' },
+            food: { icon: '🍔', name: 'Food & Dining', desc: 'Groceries, restaurants, delivery' },
+            transport: { icon: '🚗', name: 'Transportation', desc: 'Gas, car payments, rideshare' },
+            fun: { icon: '🎉', name: 'Entertainment & Fun', desc: 'Activities, hobbies, outings' },
+            savings: { icon: '💰', name: 'Savings', desc: 'Emergency fund, investments, goals' },
+            other: { icon: '💼', name: 'Other', desc: 'Shopping, subscriptions, misc' }
+        };
+
+        function selectPhilosophy(type) {
+            budgetPhilosophy.type = type;
+            
+            document.querySelectorAll('.philosophy-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.target.closest('.philosophy-option').classList.add('selected');
+        }
+
+        function savePhilosophy() {
+            localStorage.setItem('budgetPhilosophy', JSON.stringify(budgetPhilosophy));
+            showCustomAlert('✅ Budget philosophy saved!\n\nYour recommendations have been updated.');
+            renderBudget();
+        }
+
+        function getCurrentMonthData() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            return transactions.filter(t => {
+                const tDate = new Date(t.date);
+                return tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear;
+            });
+        }
+
+        function renderBudget() {
+            const monthTransactions = getCurrentMonthData();
+            
+            let income = 0;
+            const categorySpending = {};
+
+            monthTransactions.forEach(t => {
+                if (t.type === 'income') {
+                    income += t.amount;
+                } else {
+                    categorySpending[t.category] = (categorySpending[t.category] || 0) + t.amount;
+                }
+            });
+
+            if (income === 0) {
+                document.getElementById('budgetGrid').innerHTML = `
+                    <div style="text-align: center; padding: 60px; color: #666;">
+                        <p style="font-size: 1.2em; margin-bottom: 10px;">No income data yet</p>
+                        <p>Add income transactions to set up your budget</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const philosophy = philosophies[budgetPhilosophy.type];
+            
+            const categoryMap = {
+                housing: ['housing'],
+                food: ['food'],
+                transport: ['transport'],
+                fun: ['entertainment', 'shopping'],
+                other: ['subscriptions', 'education', 'other']
+            };
+
+            const actualSpending = {
+                housing: 0,
+                food: 0,
+                transport: 0,
+                fun: 0,
+                other: 0
+            };
+
+            Object.entries(categorySpending).forEach(([cat, amount]) => {
+                const group = Object.keys(categoryMap).find(k => categoryMap[k].includes(cat)) || 'other';
+                actualSpending[group] += amount;
+            });
+
+            const totalExpenses = Object.values(actualSpending).reduce((a, b) => a + b, 0);
+            const actualSavings = income - totalExpenses;
+            actualSpending.savings = actualSavings;
+
+            const budgetCards = Object.entries(categoryInfo).map(([key, info]) => {
+                const budgetAmount = income * (philosophy[key] / 100);
+                const spent = actualSpending[key] || 0;
+                const remaining = budgetAmount - spent;
+                const percentUsed = (spent / budgetAmount) * 100;
+
+                let status = 'safe';
+                let statusText = 'On Track';
+                let progressClass = 'progress-safe';
+
+                if (key === 'savings') {
+                    if (spent < budgetAmount * 0.5) {
+                        status = 'danger';
+                        statusText = 'Low Savings';
+                        progressClass = 'progress-danger';
+                    } else if (spent < budgetAmount * 0.8) {
+                        status = 'warning';
+                        statusText = 'Below Goal';
+                        progressClass = 'progress-warning';
+                    } else {
+                        statusText = 'Great!';
+                    }
+                } else {
+                    if (percentUsed >= 100) {
+                        status = 'danger';
+                        statusText = 'Over Budget';
+                        progressClass = 'progress-danger';
+                    } else if (percentUsed >= 80) {
+                        status = 'warning';
+                        statusText = 'Almost There';
+                        progressClass = 'progress-warning';
+                    }
+                }
+
+                return `
+                    <div class="budget-card">
+                        <div class="budget-header">
+                            <div class="budget-title">${info.icon} ${info.name}</div>
+                            <div class="budget-status status-${status}">${statusText}</div>
+                        </div>
+
+                        <p style="color: #999; font-size: 0.9em; margin-bottom: 15px;">${info.desc}</p>
+
+                        <div class="budget-amounts">
+                            <div class="amount-item">
+                                <div class="amount-label">Budget</div>
+                                <div class="amount-value">$${budgetAmount.toFixed(0)}</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">${key === 'savings' ? 'Saved' : 'Spent'}</div>
+                                <div class="amount-value" style="color: ${status === 'danger' ? '#ff4444' : status === 'warning' ? '#ff8800' : '#4CAF50'}">
+                                    $${Math.abs(spent).toFixed(0)}
+                                </div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">${key === 'savings' ? 'To Save' : 'Remaining'}</div>
+                                <div class="amount-value">${remaining >= 0 ? '$' + remaining.toFixed(0) : '-$' + Math.abs(remaining).toFixed(0)}</div>
+                            </div>
+                        </div>
+
+                        <div class="progress-bar">
+                            <div class="progress-fill ${progressClass}" style="width: ${Math.min(percentUsed, 100)}%"></div>
+                        </div>
+                        <div class="progress-text">${Math.min(percentUsed, 100).toFixed(0)}% of budget ${percentUsed > 100 ? '(Over!)' : 'used'}</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('budgetGrid').innerHTML = budgetCards;
+        }
+
+        function showCustomAlert(message) {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px;';
+            modal.innerHTML = `
+                <div style="background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 30px; max-width: 400px; width: 100%; text-align: center;">
+                    <p style="color: #e0e0e0; line-height: 1.6; white-space: pre-line; margin-bottom: 25px;">${message}</p>
+                    <button onclick="this.closest('div[style*=fixed]').remove()" style="width: 100%; padding: 12px; background: #fff; color: #000; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">OK</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Initialize
+        const savedPhilosophy = budgetPhilosophy.type || 'balanced';
+        document.querySelector(`.philosophy-option:nth-child(${savedPhilosophy === 'aggressive' ? 1 : savedPhilosophy === 'balanced' ? 2 : 3})`).classList.add('selected');
+        
+        renderBudget();
+    </script>
+</body>
+</html>
