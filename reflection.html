@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Reflection - Life Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #fff;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #3a3a3a;
+        }
+
+        .reflection-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .reflection-card h2 {
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .question-group {
+            margin-bottom: 30px;
+        }
+
+        .question-label {
+            color: #e0e0e0;
+            font-weight: 500;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 1em;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #fff;
+        }
+
+        .mood-selector {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .mood-option {
+            padding: 15px 25px;
+            background: #0a0a0a;
+            border: 2px solid #2a2a2a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 2em;
+        }
+
+        .mood-option:hover {
+            border-color: #fff;
+        }
+
+        .mood-option.selected {
+            border-color: #4CAF50;
+            background: #1a2a1a;
+        }
+
+        .history-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .history-card {
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .history-date {
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .history-section {
+            margin-bottom: 15px;
+        }
+
+        .history-label {
+            color: #999;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .history-text {
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Weekly Reflection</h1>
+            <a href="index.html" class="btn btn-secondary">← Dashboard</a>
+        </header>
+
+        <div class="reflection-card">
+            <h2>This Week's Reflection</h2>
+            <p style="color: #999; margin-bottom: 30px;">Take a moment to reflect on your week. Be honest with yourself.</p>
+
+            <form onsubmit="saveReflection(event)">
+                <div class="question-group">
+                    <label class="question-label">How would you rate this week overall?</label>
+                    <div class="mood-selector">
+                        <div class="mood-option" onclick="selectMood('😞', event)">😞</div>
+                        <div class="mood-option" onclick="selectMood('😐', event)">😐</div>
+                        <div class="mood-option" onclick="selectMood('🙂', event)">🙂</div>
+                        <div class="mood-option" onclick="selectMood('😊', event)">😊</div>
+                        <div class="mood-option" onclick="selectMood('🤩', event)">🤩</div>
+                    </div>
+                    <input type="hidden" id="weekMood" required>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">What went well this week?</label>
+                    <textarea id="wentWell" placeholder="Celebrate your wins, no matter how small..." required></textarea>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">What was challenging?</label>
+                    <textarea id="challenges" placeholder="What was difficult or didn't go as planned?" required></textarea>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">What did you learn about yourself?</label>
+                    <textarea id="learnings" placeholder="Any insights or realizations?" required></textarea>
+                </div>
+
+                <div class="question-group">
+                    <label class="question-label">What do you want to improve next week?</label>
+                    <textarea id="improvements" placeholder="One or two things to focus on..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%;">Save Reflection</button>
+            </form>
+        </div>
+
+        <div class="reflection-card">
+            <h2>Past Reflections</h2>
+            <div class="history-grid" id="reflectionHistory"></div>
+        </div>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+
+        let reflections = JSON.parse(localStorage.getItem('reflections') || '[]');
+        let selectedMood = null;
+
+        function selectMood(mood, event) {
+            selectedMood = mood;
+            document.getElementById('weekMood').value = mood;
+
+            document.querySelectorAll('.mood-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function saveReflection(event) {
+            event.preventDefault();
+
+            const reflection = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                mood: selectedMood,
+                wentWell: document.getElementById('wentWell').value,
+                challenges: document.getElementById('challenges').value,
+                learnings: document.getElementById('learnings').value,
+                improvements: document.getElementById('improvements').value
+            };
+
+            reflections.unshift(reflection);
+            localStorage.setItem('reflections', JSON.stringify(reflections));
+
+            showCustomAlert('✅ Reflection saved!\n\nGreat job taking time to reflect on your week.');
+
+            event.target.reset();
+            selectedMood = null;
+            document.querySelectorAll('.mood-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('reflectionHistory');
+
+            if (reflections.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No reflections yet. Complete one above!</p></div>';
+                return;
+            }
+
+            container.innerHTML = reflections.map(r => {
+                const date = new Date(r.date);
+                const weekStart = new Date(date);
+                weekStart.setDate(date.getDate() - date.getDay());
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+
+                return `
+                    <div class="history-card">
+                        <div class="history-date">
+                            ${r.mood} Week of ${weekStart.toLocaleDateString()} - ${weekEnd.toLocaleDateString()}
+                        </div>
+
+                        <div class="history-section">
+                            <div class="history-label">✅ What went well:</div>
+                            <div class="history-text">${r.wentWell}</div>
+                        </div>
+
+                        <div class="history-section">
+                            <div class="history-label">⚠️ Challenges:</div>
+                            <div class="history-text">${r.challenges}</div>
+                        </div>
+
+                        <div class="history-section">
+                            <div class="history-label">💡 Learnings:</div>
+                            <div class="history-text">${r.learnings}</div>
+                        </div>
+
+                        <div class="history-section">
+                            <div class="history-label">🎯 Next week's focus:</div>
+                            <div class="history-text">${r.improvements}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showCustomAlert(message) {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px;';
+            modal.innerHTML = `
+                <div style="background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 30px; max-width: 400px; width: 100%; text-align: center;">
+                    <p style="color: #e0e0e0; line-height: 1.6; white-space: pre-line; margin-bottom: 25px;">${message}</p>
+                    <button onclick="this.closest('div[style*=fixed]').remove()" style="width: 100%; padding: 12px; background: #fff; color: #000; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">OK</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        renderHistory();
+    </script>
+</body>
+</html>
