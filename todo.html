@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do - Life Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #fff;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #3a3a3a;
+        }
+
+        .energy-status {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .energy-status h3 {
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .add-task-section {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .task-input-group {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 10px;
+        }
+
+        input[type="text"], input[type="date"], select {
+            padding: 12px;
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 1em;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #fff;
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.2s;
+        }
+
+        .task-card:hover {
+            border-color: #3a3a3a;
+        }
+
+        .task-card.completed {
+            opacity: 0.6;
+        }
+
+        input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #4CAF50;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-size: 1.1em;
+            color: #fff;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .task-title.completed {
+            text-decoration: line-through;
+            color: #666;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .priority-critical { background: #ff4444; color: #fff; }
+        .priority-high { background: #ff8800; color: #fff; }
+        .priority-medium { background: #ffbb00; color: #000; }
+        .priority-low { background: #4CAF50; color: #fff; }
+
+        .energy-tag {
+            padding: 4px 10px;
+            background: #2a2a2a;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+
+        .energy-high { background: #1a3a1a; color: #4CAF50; }
+        .energy-medium { background: #3a3a1a; color: #ffbb00; }
+        .energy-low { background: #3a1a1a; color: #ff8800; }
+
+        .delete-btn {
+            background: #2a2a2a;
+            border: none;
+            color: #999;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #ff4444;
+            color: #fff;
+        }
+
+        .section-title {
+            color: #fff;
+            font-size: 1.2em;
+            margin: 30px 0 15px 0;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .task-input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📋 To-Do List</h1>
+            <a href="index.html" class="btn btn-secondary">← Dashboard</a>
+        </header>
+
+        <div class="energy-status" id="energyStatus">
+            <h3>Today's Energy Level: Loading...</h3>
+            <p style="color: #999; font-size: 0.9em;">Tasks are sorted based on your daily check-in</p>
+        </div>
+
+        <div class="add-task-section">
+            <h3 style="color: #fff; margin-bottom: 15px;">Add New Task</h3>
+            <form onsubmit="addTask(event)">
+                <div class="task-input-group">
+                    <input type="text" id="taskTitle" placeholder="What needs to be done?" required>
+                    <select id="taskPriority" required>
+                        <option value="critical">🔴 Critical</option>
+                        <option value="high">🟠 High</option>
+                        <option value="medium" selected>🟡 Medium</option>
+                        <option value="low">🟢 Low</option>
+                    </select>
+                    <select id="taskEnergy" required>
+                        <option value="high">⚡ High Energy</option>
+                        <option value="medium" selected>💪 Medium Energy</option>
+                        <option value="low">🌙 Low Energy</option>
+                    </select>
+                    <button type="submit" class="btn">Add Task</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="section-title">📌 Recommended for Today</div>
+        <div class="task-list" id="recommendedTasks"></div>
+
+        <div class="section-title">📝 All Tasks</div>
+        <div class="task-list" id="allTasks"></div>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+
+        let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        const todayCheckIn = JSON.parse(localStorage.getItem('checkInHistory') || '[]').slice(-1)[0];
+
+        function getUserEnergy() {
+            if (!todayCheckIn) return 'medium';
+            
+            const today = new Date().toDateString();
+            const checkInDate = new Date(todayCheckIn.date).toDateString();
+            
+            if (today !== checkInDate) return 'medium';
+            
+            if (todayCheckIn.energy >= 8) return 'high';
+            if (todayCheckIn.energy >= 5) return 'medium';
+            return 'low';
+        }
+
+        function updateEnergyStatus() {
+            const userEnergy = getUserEnergy();
+            const energyLabels = {
+                high: '🔥 High - Great time for challenging tasks!',
+                medium: '💪 Medium - Balanced productivity',
+                low: '🌙 Low - Focus on easy wins'
+            };
+            
+            document.getElementById('energyStatus').innerHTML = `
+                <h3>Today's Energy Level: ${energyLabels[userEnergy]}</h3>
+                <p style="color: #999; font-size: 0.9em;">Tasks are sorted to match your energy</p>
+            `;
+        }
+
+        function calculatePriority(task) {
+            const priorityScores = {
+                critical: 10,
+                high: 6,
+                medium: 4,
+                low: 2
+            };
+            
+            const energyMatch = {
+                high: task.energy === 'high' ? 1.5 : task.energy === 'medium' ? 1.2 : 1,
+                medium: task.energy === 'medium' ? 1.5 : task.energy === 'low' ? 1.2 : 1,
+                low: task.energy === 'low' ? 1.5 : task.energy === 'medium' ? 1.2 : 1
+            };
+            
+            const userEnergy = getUserEnergy();
+            return priorityScores[task.priority] * energyMatch[userEnergy];
+        }
+
+        function addTask(event) {
+            event.preventDefault();
+            
+            const task = {
+                id: Date.now(),
+                title: document.getElementById('taskTitle').value,
+                priority: document.getElementById('taskPriority').value,
+                energy: document.getElementById('taskEnergy').value,
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+            
+            tasks.push(task);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            
+            event.target.reset();
+            renderTasks();
+        }
+
+        function toggleTask(id) {
+            tasks = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const userEnergy = getUserEnergy();
+            const incomplete = tasks.filter(t => !t.completed);
+            const completed = tasks.filter(t => t.completed);
+            
+            const sorted = [...incomplete].sort((a, b) => calculatePriority(b) - calculatePriority(a));
+            
+            const recommended = sorted.filter(t => {
+                if (userEnergy === 'high') return t.energy === 'high' || t.energy === 'medium';
+                if (userEnergy === 'medium') return t.energy === 'medium' || t.energy === 'low';
+                return t.energy === 'low';
+            });
+
+            const recommendedContainer = document.getElementById('recommendedTasks');
+            const allContainer = document.getElementById('allTasks');
+            
+            if (recommended.length === 0) {
+                recommendedContainer.innerHTML = '<div class="empty-state"><p>No tasks match your current energy level</p></div>';
+            } else {
+                recommendedContainer.innerHTML = recommended.map(renderTaskCard).join('');
+            }
+            
+            if (tasks.length === 0) {
+                allContainer.innerHTML = '<div class="empty-state"><p>No tasks yet. Add one above!</p></div>';
+            } else {
+                allContainer.innerHTML = [...sorted, ...completed].map(renderTaskCard).join('');
+            }
+        }
+
+        function renderTaskCard(task) {
+            const priorityLabels = {
+                critical: 'Critical',
+                high: 'High',
+                medium: 'Medium',
+                low: 'Low'
+            };
+            
+            const energyLabels = {
+                high: '⚡ High Energy',
+                medium: '💪 Medium',
+                low: '🌙 Low Energy'
+            };
+            
+            return `
+                <div class="task-card ${task.completed ? 'completed' : ''}">
+                    <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})">
+                    <div class="task-content">
+                        <div class="task-title ${task.completed ? 'completed' : ''}">${task.title}</div>
+                        <div class="task-meta">
+                            <span class="priority-badge priority-${task.priority}">${priorityLabels[task.priority]}</span>
+                            <span class="energy-tag energy-${task.energy}">${energyLabels[task.energy]}</span>
+                        </div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+                </div>
+            `;
+        }
+
+        updateEnergyStatus();
+        renderTasks();
+    </script>
+</body>
+</html>
