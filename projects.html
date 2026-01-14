@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Life Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #fff;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #3a3a3a;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .project-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.2s;
+        }
+
+        .project-card:hover {
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .project-title {
+            font-size: 1.3em;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .project-status {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .status-active { background: #4CAF50; color: #fff; }
+        .status-planning { background: #ff8800; color: #fff; }
+        .status-completed { background: #2a2a2a; color: #999; }
+
+        .project-description {
+            color: #999;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .project-progress {
+            margin-bottom: 15px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #0a0a0a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #2a2a2a;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .close-btn {
+            float: right;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Projects</h1>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" onclick="openAddModal()">+ New Project</button>
+                <a href="index.html" class="btn btn-secondary">← Dashboard</a>
+            </div>
+        </header>
+
+        <div class="projects-grid" id="projectsGrid"></div>
+    </div>
+
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <h2 style="color: #fff; margin-bottom: 25px;">New Project</h2>
+            <form onsubmit="saveProject(event)">
+                <div class="form-group">
+                    <label>Project Name</label>
+                    <input type="text" id="projectName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="projectDescription" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Deadline</label>
+                    <input type="date" id="projectDeadline" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="projectStatus">
+                        <option value="planning">Planning</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%;">Create Project</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+
+        let projects = JSON.parse(localStorage.getItem('projects') || '[]');
+
+        function openAddModal() {
+            document.getElementById('projectModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('projectModal').classList.remove('active');
+        }
+
+        function saveProject(event) {
+            event.preventDefault();
+
+            const project = {
+                id: Date.now(),
+                name: document.getElementById('projectName').value,
+                description: document.getElementById('projectDescription').value,
+                deadline: document.getElementById('projectDeadline').value,
+                status: document.getElementById('projectStatus').value,
+                progress: 0,
+                createdAt: new Date().toISOString()
+            };
+
+            projects.push(project);
+            localStorage.setItem('projects', JSON.stringify(projects));
+
+            closeModal();
+            event.target.reset();
+            renderProjects();
+        }
+
+        function updateProgress(id, progress) {
+            projects = projects.map(p => p.id === id ? { ...p, progress } : p);
+            localStorage.setItem('projects', JSON.stringify(projects));
+            renderProjects();
+        }
+
+        function renderProjects() {
+            const grid = document.getElementById('projectsGrid');
+
+            if (projects.length === 0) {
+                grid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><h2 style="color: #999; margin-bottom: 10px;">No projects yet</h2><p>Click "+ New Project" to get started</p></div>';
+                return;
+            }
+
+            grid.innerHTML = projects.map(project => {
+                const deadline = new Date(project.deadline);
+                const daysLeft = Math.ceil((deadline - new Date()) / (1000 * 60 * 60 * 24));
+
+                return `
+                    <div class="project-card">
+                        <div class="project-header">
+                            <div class="project-title">${project.name}</div>
+                            <div class="project-status status-${project.status}">
+                                ${project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                            </div>
+                        </div>
+
+                        <div class="project-description">${project.description}</div>
+
+                        <div class="project-progress">
+                            <div class="progress-label">
+                                <span>Progress</span>
+                                <span style="color: #fff; font-weight: 600;">${project.progress}%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${project.progress}%"></div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 8px; margin-top: 15px;">
+                            <button onclick="updateProgress(${project.id}, Math.min(${project.progress} + 10, 100))" 
+                                    style="flex: 1; padding: 8px; background: #2a2a2a; border: none; color: #fff; border-radius: 4px; cursor: pointer;">
+                                +10%
+                            </button>
+                            <button onclick="updateProgress(${project.id}, 100)" 
+                                    style="flex: 1; padding: 8px; background: #4CAF50; border: none; color: #fff; border-radius: 4px; cursor: pointer;">
+                                Complete
+                            </button>
+                        </div>
+
+                        <div class="project-meta">
+                            <span>📅 Due: ${deadline.toLocaleDateString()}</span>
+                            <span>${daysLeft > 0 ? `${daysLeft} days left` : daysLeft === 0 ? 'Due today!' : 'Overdue'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        renderProjects();
+    </script>
+</body>
+</html>
