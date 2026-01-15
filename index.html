@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Life Dashboard - Personal Growth Tracker</title>
+    <title>Life Dashboard - Home</title>
     <style>
+        /* --- GLOBAL STYLES --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
@@ -15,20 +16,19 @@
         }
         .container { max-width: 1200px; margin: 0 auto; }
         
-        /* --- Header Styles --- */
+        /* --- HEADER --- */
         header {
             color: #ffffff;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             padding: 30px 0;
             border-bottom: 1px solid #2a2a2a;
         }
         .header-content { display: flex; justify-content: space-between; align-items: center; }
         h1 { font-size: 2.5em; margin-bottom: 8px; font-weight: 600; color: #fff; }
         .tagline { font-size: 1em; color: #999; }
-        .header-actions { display: flex; gap: 10px; align-items: center; }
-        .user-greeting { color: #999; font-size: 0.9em; margin-right: 10px; }
+        .btn-logout { background: #3a3a3a; color: #fff; border: none; padding: 8px 16px; cursor: pointer; border-radius: 6px; }
 
-        /* --- Grid & Cards --- */
+        /* --- DASHBOARD GRID --- */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -42,185 +42,103 @@
             padding: 20px;
             transition: all 0.2s ease;
             cursor: pointer;
+            text-decoration: none; /* For link behavior */
+            display: block;
         }
         .card:hover { border-color: #fff; transform: translateY(-2px); }
         .card h2 { color: #fff; margin-bottom: 8px; font-size: 1.1em; display: flex; align-items: center; gap: 8px; }
         .card-icon { font-size: 1.4em; }
         .card p { color: #999; font-size: 0.9em; line-height: 1.5; }
 
-        /* --- CALENDAR STYLES (New & Fixed) --- */
+        /* --- CALENDAR SECTION (INTEGRATED BELOW GRID) --- */
         .calendar-section {
             background: #1a1a1a;
             border: 1px solid #2a2a2a;
             border-radius: 8px;
             padding: 25px;
-            margin-top: 30px; /* Spacing from the grid */
-            margin-bottom: 50px;
+            margin-top: 30px;
         }
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .month-year { font-size: 1.5em; font-weight: 600; color: #fff; }
         .calendar-nav-btn {
-            background: #2a2a2a;
-            border: none;
-            color: #fff;
-            padding: 5px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1.2em;
+            background: #2a2a2a; border: none; color: #fff; padding: 5px 15px;
+            border-radius: 4px; cursor: pointer; font-size: 1.2em;
         }
-        .calendar-nav-btn:hover { background: #3a3a3a; }
-        
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            text-align: center;
-        }
-        .day-name {
-            color: #666;
-            font-weight: 600;
-            padding-bottom: 10px;
-            font-size: 0.9em;
-        }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+        .day-name { color: #666; font-weight: 600; padding-bottom: 10px; font-size: 0.9em; }
         .calendar-day {
-            background: #0f0f0f;
-            border: 1px solid #2a2a2a;
-            border-radius: 4px;
-            min-height: 80px;
-            padding: 8px;
-            position: relative;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
+            background: #0f0f0f; border: 1px solid #2a2a2a; border-radius: 4px;
+            min-height: 90px; padding: 8px; cursor: pointer;
+            display: flex; flex-direction: column; align-items: flex-start;
         }
         .calendar-day:hover { background: #222; border-color: #444; }
-        .calendar-day.today { border: 1px solid #fff; background: #222; }
+        .calendar-day.today { border: 1px solid #fff; }
         .day-number { font-size: 0.9em; color: #ccc; margin-bottom: 5px; }
-        .day-event-dot {
-            width: 6px; height: 6px; background: #fff; border-radius: 50%;
-            margin-top: 4px;
-        }
         .event-text {
-            font-size: 0.7em;
-            color: #aaa;
-            text-align: left;
-            width: 100%;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            background: #2a2a2a;
-            padding: 2px 4px;
-            border-radius: 3px;
-            margin-top: 2px;
+            font-size: 0.7em; color: #aaa; text-align: left; width: 100%;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            background: #2a2a2a; padding: 2px 4px; border-radius: 3px; margin-top: 2px;
         }
         .calendar-day.padding { background: transparent; border: none; cursor: default; }
 
-        /* --- Buttons --- */
-        .btn {
-            background: #fff; color: #000; padding: 10px 20px; border-radius: 6px;
-            border: none; cursor: pointer; font-weight: 600; transition: all 0.2s;
-        }
-        .btn:hover { background: #e0e0e0; transform: scale(1.02); }
-        .btn-secondary { background: #2a2a2a; color: #fff; border: 1px solid #3a3a3a; padding: 8px 16px; }
-        .btn-secondary:hover { background: #3a3a3a; border-color: #fff; }
-        .btn-logout { background: #3a3a3a; color: #fff; border: none; padding: 8px 16px; cursor: pointer; border-radius: 6px; }
-        .btn-logout:hover { background: #4a4a4a; }
-
-        /* --- Modals --- */
+        /* --- MODAL --- */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center;
         }
         .modal.active { display: flex; }
-        .modal-content {
-            background: #1a1a1a; border: 1px solid #2a2a2a; padding: 40px;
-            border-radius: 12px; max-width: 500px; width: 90%; position: relative;
-        }
-        .close { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: #666; }
-        .close:hover { color: #fff; }
-        
-        textarea, input[type="text"] {
-            width: 100%; padding: 15px; border: 1px solid #2a2a2a;
-            background: #0a0a0a; color: #e0e0e0; border-radius: 6px; font-family: inherit;
-            margin: 10px 0;
-        }
-        
-        @media (max-width: 768px) {
-            .header-content { flex-direction: column; gap: 20px; }
-            .grid { grid-template-columns: 1fr; }
-            .calendar-grid { grid-template-columns: repeat(7, 1fr); }
-            .calendar-day { min-height: 50px; font-size: 0.8em; }
-            .day-name { font-size: 0.7em; }
-        }
+        .modal-content { background: #1a1a1a; border: 1px solid #2a2a2a; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; }
+        input[type="text"] { width: 100%; padding: 12px; background: #0a0a0a; border: 1px solid #2a2a2a; color: #fff; margin: 15px 0; border-radius: 6px; }
+        .btn { background: #fff; color: #000; padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-secondary { background: #2a2a2a; color: #fff; margin-left: 10px; }
     </style>
 </head>
 <body>
-
-    <div id="eventModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeEventModal()">&times;</span>
-            <h2>📅 Add Event</h2>
-            <p id="selectedDateDisplay" style="color: #999; margin-bottom: 15px;"></p>
-            <input type="text" id="eventInput" placeholder="Meeting, Gym, Deadline...">
-            <button class="btn" onclick="saveEvent()">Save Event</button>
-            <button class="btn btn-secondary" onclick="deleteEvent()" style="margin-left: 10px;">Clear Day</button>
-        </div>
-    </div>
 
     <div class="container">
         <header>
             <div class="header-content">
                 <div>
                     <h1>Life Dashboard</h1>
-                    <p class="tagline">Track, Grow, Achieve</p>
+                    <p class="tagline">Interactive Hub</p>
                 </div>
-                <div class="header-actions">
-                    <span class="user-greeting" id="userGreeting"></span>
-                    <button onclick="logout()" class="btn-logout">Logout</button>
-                </div>
+                <button onclick="location.href='login.html'" class="btn-logout">Logout</button>
             </div>
         </header>
 
         <div class="grid">
-            <div class="card" onclick="alert('Goals Page Coming Soon')">
+            <a href="goals.html" class="card">
                 <h2><span class="card-icon">🎯</span> Goals</h2>
-                <p>Short and long-term goals with milestones</p>
-            </div>
-            <div class="card" onclick="alert('Habits Page Coming Soon')">
+                <p>Short and long-term milestones</p>
+            </a>
+            <a href="habits.html" class="card">
                 <h2><span class="card-icon">✓</span> Daily Habits</h2>
-                <p>Track daily habits with visual progress</p>
-            </div>
-            <div class="card" onclick="alert('ToDo Page Coming Soon')">
+                <p>Visual habit tracking</p>
+            </a>
+            <a href="todo.html" class="card">
                 <h2><span class="card-icon">📋</span> To-Do</h2>
-                <p>Daily tasks with progress tracking</p>
-            </div>
-            <div class="card" onclick="alert('Projects Page Coming Soon')">
+                <p>Daily task management</p>
+            </a>
+            <a href="projects.html" class="card">
                 <h2><span class="card-icon">📊</span> Projects</h2>
-                <p>Track progress with calendar integration</p>
-            </div>
-            <div class="card" onclick="alert('Finance Page Coming Soon')">
+                <p>Progress tracking</p>
+            </a>
+            <a href="finances.html" class="card">
                 <h2><span class="card-icon">💰</span> Finances</h2>
-                <p>Budget tracker and savings goals</p>
-            </div>
-            <div class="card" onclick="alert('Meals Page Coming Soon')">
+                <p>Budget and savings</p>
+            </a>
+            <a href="meals.html" class="card">
                 <h2><span class="card-icon">🍽</span> Meals</h2>
-                <p>Weekly meal planning and prep</p>
-            </div>
-            <div class="card" onclick="alert('Reflection Page Coming Soon')">
-                <h2><span class="card-icon">📝</span> Weekly Reflection</h2>
-                <p>Track your emotional journey over time</p>
-            </div>
-            <div class="card" onclick="alert('Review Page Coming Soon')">
+                <p>Weekly planning</p>
+            </a>
+            <a href="reflection.html" class="card">
+                <h2><span class="card-icon">📝</span> Reflection</h2>
+                <p>Weekly journal</p>
+            </a>
+            <a href="monthly.html" class="card">
                 <h2><span class="card-icon">📅</span> Monthly Review</h2>
-                <p>Set new goals and review accomplishments</p>
-            </div>
+                <p>Analyze progress</p>
+            </a>
         </div>
 
         <div class="calendar-section">
@@ -229,35 +147,20 @@
                 <div class="month-year" id="monthYear"></div>
                 <button class="calendar-nav-btn" onclick="changeMonth(1)">&#10095;</button>
             </div>
-            <div class="calendar-grid" id="calendarGrid">
-                </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+    </div>
+
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalDateTitle">Add Event</h2>
+            <input type="text" id="eventInput" placeholder="Event description...">
+            <button class="btn" onclick="saveEvent()">Save</button>
+            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
         </div>
     </div>
 
     <script>
-        // --- Authentication Check ---
-        if (!localStorage.getItem('isLoggedIn')) {
-            // Uncomment the line below to enforce login, commented out so you can see the calendar immediately
-            // window.location.href = 'login.html'; 
-            
-            // For testing purposes, let's fake a login if one doesn't exist
-            if(!localStorage.getItem('userName')) {
-                localStorage.setItem('userName', 'User');
-            }
-        }
-
-        const userName = localStorage.getItem('userName') || 'User';
-        const greeting = document.getElementById('userGreeting');
-        if (greeting) greeting.textContent = `Hi, ${userName}`;
-
-        function logout() {
-            if(confirm('Logout?')) {
-                localStorage.removeItem('isLoggedIn');
-                window.location.href = 'login.html';
-            }
-        }
-
-        // --- CALENDAR LOGIC ---
         let currentDate = new Date();
         let selectedDateKey = null;
 
@@ -268,121 +171,50 @@
 
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-
-            // Month Names
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             monthYear.innerText = `${months[month]} ${year}`;
 
-            // Weekday Headers
             const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            days.forEach(day => {
-                const div = document.createElement('div');
-                div.classList.add('day-name');
-                div.innerText = day;
-                grid.appendChild(div);
-            });
+            days.forEach(d => grid.innerHTML += `<div class="day-name">${d}</div>`);
 
-            // Logic for days
-            const firstDayIndex = new Date(year, month, 1).getDay();
+            const firstDay = new Date(year, month, 1).getDay();
             const lastDay = new Date(year, month + 1, 0).getDate();
-            const today = new Date();
+            const events = JSON.parse(localStorage.getItem('dashboardEvents') || '{}');
 
-            // Retrieve events from local storage
-            const events = JSON.parse(localStorage.getItem('calendarEvents') || '{}');
+            for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div class="calendar-day padding"></div>`;
 
-            // Padding days (empty boxes before the 1st)
-            for (let i = 0; i < firstDayIndex; i++) {
-                const div = document.createElement('div');
-                div.classList.add('calendar-day', 'padding');
-                grid.appendChild(div);
-            }
-
-            // Actual days
             for (let i = 1; i <= lastDay; i++) {
-                const div = document.createElement('div');
-                div.classList.add('calendar-day');
-                
-                // Create unique key for storage (e.g., "2023-10-15")
                 const dateKey = `${year}-${month}-${i}`;
-
-                // Check if it's today
-                if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-                    div.classList.add('today');
-                }
-
-                div.innerHTML = `<div class="day-number">${i}</div>`;
-
-                // If event exists, show it
-                if (events[dateKey]) {
-                    div.innerHTML += `<div class="event-text">${events[dateKey]}</div>`;
-                }
-
-                // Click event
-                div.onclick = () => openEventModal(dateKey, i);
-
-                grid.appendChild(div);
+                const isToday = new Date().toDateString() === new Date(year, month, i).toDateString();
+                const eventHtml = events[dateKey] ? `<div class="event-text">${events[dateKey]}</div>` : '';
+                
+                const dayEl = document.createElement('div');
+                dayEl.className = `calendar-day ${isToday ? 'today' : ''}`;
+                dayEl.innerHTML = `<div class="day-number">${i}</div>${eventHtml}`;
+                dayEl.onclick = () => openModal(dateKey, i);
+                grid.appendChild(dayEl);
             }
         }
 
-        function changeMonth(direction) {
-            currentDate.setMonth(currentDate.getMonth() + direction);
-            renderCalendar();
+        function changeMonth(dir) { currentDate.setMonth(currentDate.getMonth() + dir); renderCalendar(); }
+
+        function openModal(key, day) {
+            selectedDateKey = key;
+            document.getElementById('modalDateTitle').innerText = `Date: ${day}`;
+            document.getElementById('eventModal').classList.add('active');
         }
 
-        // --- Event Modal Logic ---
-        function openEventModal(dateKey, day) {
-            selectedDateKey = dateKey;
-            const modal = document.getElementById('eventModal');
-            const display = document.getElementById('selectedDateDisplay');
-            const input = document.getElementById('eventInput');
-            
-            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            display.innerText = `${months[currentDate.getMonth()]} ${day}, ${currentDate.getFullYear()}`;
-            
-            // Load existing event if any
-            const events = JSON.parse(localStorage.getItem('calendarEvents') || '{}');
-            input.value = events[dateKey] || '';
-
-            modal.classList.add('active');
-            input.focus();
-        }
-
-        function closeEventModal() {
-            document.getElementById('eventModal').classList.remove('active');
-        }
+        function closeModal() { document.getElementById('eventModal').classList.remove('active'); }
 
         function saveEvent() {
-            const input = document.getElementById('eventInput').value;
-            const events = JSON.parse(localStorage.getItem('calendarEvents') || '{}');
-            
-            if (input.trim()) {
-                events[selectedDateKey] = input;
-            } else {
-                delete events[selectedDateKey];
-            }
-            
-            localStorage.setItem('calendarEvents', JSON.stringify(events));
-            closeEventModal();
-            renderCalendar(); // Refresh UI
-        }
-
-        function deleteEvent() {
-            const events = JSON.parse(localStorage.getItem('calendarEvents') || '{}');
-            delete events[selectedDateKey];
-            localStorage.setItem('calendarEvents', JSON.stringify(events));
-            closeEventModal();
+            const val = document.getElementById('eventInput').value;
+            const events = JSON.parse(localStorage.getItem('dashboardEvents') || '{}');
+            if (val) events[selectedDateKey] = val; else delete events[selectedDateKey];
+            localStorage.setItem('dashboardEvents', JSON.stringify(events));
+            closeModal();
             renderCalendar();
         }
 
-        // Close modal if clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('eventModal');
-            if (event.target == modal) {
-                closeEventModal();
-            }
-        }
-
-        // Initialize
         renderCalendar();
     </script>
 </body>
