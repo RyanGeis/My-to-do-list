@@ -1,236 +1,711 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Dashboard - Personal Growth Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<style>
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #0f0f0f;
-  color: white;
-  padding-bottom: 90px;
-}
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-h1 {
-  text-align: center;
-  margin-top: 20px;
-}
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-.grid {
-  display: grid;
-  gap: 12px;
-  padding: 20px;
-}
+        header {
+            color: #ffffff;
+            margin-bottom: 50px;
+            padding: 40px 0;
+            border-bottom: 1px solid #2a2a2a;
+        }
 
-button {
-  padding: 14px;
-  border-radius: 10px;
-  border: none;
-  background: #1f1f1f;
-  color: white;
-  cursor: pointer;
-}
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-}
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #fff;
+        }
 
-.modal-content {
-  background: #141414;
-  padding: 20px;
-  border-radius: 14px;
-  width: 90%;
-  max-width: 400px;
-}
+        .tagline {
+            font-size: 1em;
+            color: #999;
+            font-weight: 400;
+        }
 
-.modal-content.large {
-  max-width: 600px;
-}
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
 
-label {
-  display: block;
-  margin-top: 10px;
-}
+        .user-greeting {
+            color: #999;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
 
-select {
-  width: 100%;
-  padding: 8px;
-  margin-top: 4px;
-}
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
 
-#weekBar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 80px;
-  background: #111;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  cursor: pointer;
-}
+        .card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
 
-.day {
-  opacity: 0.6;
-}
+        .card:hover {
+            border-color: #fff;
+            box-shadow: 0 4px 12px rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
 
-.day.today {
-  opacity: 1;
-  font-weight: bold;
-}
+        .card h2 {
+            color: #fff;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-#calendarGrid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  margin-top: 16px;
-}
-</style>
-</head>
+        .card-icon {
+            font-size: 1.4em;
+        }
 
-<body>
+        .card p {
+            color: #999;
+            line-height: 1.5;
+            margin-bottom: 0;
+            font-size: 0.9em;
+        }
 
-<h1>Daily System</h1>
+        .btn {
+            display: inline-block;
+            background: #fff;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin-top: 12px;
+            transition: all 0.2s;
+            font-size: 0.9em;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
 
-<div class="grid">
-  <button onclick="openModal('checkinModal')">Daily Check-In</button>
-</div>
+        .btn:hover {
+            background: #e0e0e0;
+            transform: scale(1.02);
+        }
 
-<!-- CHECK-IN MODAL -->
-<div id="checkinModal" class="modal">
-  <div class="modal-content">
-    <h2>Daily Check-In</h2>
+        .btn-secondary {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #3a3a3a;
+            padding: 8px 16px;
+        }
 
-    <label>Mood</label>
-    <select id="mood">
-      <option>Low</option>
-      <option>Neutral</option>
-      <option>High</option>
-    </select>
+        .btn-secondary:hover {
+            background: #3a3a3a;
+            border-color: #fff;
+        }
 
-    <label>Energy</label>
-    <select id="energy">
-      <option>Low</option>
-      <option>Medium</option>
-      <option>High</option>
-    </select>
+        .btn-logout {
+            background: #3a3a3a;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+        }
 
-    <label>Focus</label>
-    <select id="focus">
-      <option>Low</option>
-      <option>Medium</option>
-      <option>High</option>
-    </select>
+        .btn-logout:hover {
+            background: #4a4a4a;
+        }
 
-    <br><br>
-    <button onclick="submitCheckIn()">Save</button>
-    <button onclick="closeModal('checkinModal')">Close</button>
-  </div>
-</div>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
 
-<!-- CALENDAR MODAL -->
-<div id="calendarModal" class="modal">
-  <div class="modal-content large">
-    <h2 id="calendarHeader"></h2>
-    <div id="calendarGrid"></div>
-    <br>
-    <button onclick="closeCalendar()">Close</button>
-  </div>
-</div>
+        .modal.active {
+            display: flex;
+        }
 
-<!-- WEEK BAR -->
-<div id="weekBar" onclick="openCalendar()"></div>
+        .modal-content {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
 
-<script>
-const $ = (id) => document.getElementById(id);
-const today = new Date();
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.2s;
+        }
 
-/* MODALS */
-function openModal(id) {
-  $(id).style.display = "flex";
-}
-function closeModal(id) {
-  $(id).style.display = "none";
-}
+        .close:hover {
+            color: #fff;
+        }
 
-/* CHECK-IN */
-function submitCheckIn() {
-  const data = {
-    mood: $("mood").value,
-    energy: $("energy").value,
-    focus: $("focus").value,
-    date: today.toDateString()
-  };
-  localStorage.setItem("lastCheckIn", JSON.stringify(data));
-  alert("Check-in saved.");
-  closeModal("checkinModal");
-}
+        .welcome-popup {
+            text-align: center;
+        }
 
-/* WEEK BAR */
-function renderWeekBar() {
-  $("weekBar").innerHTML = "";
-  const start = new Date(today);
-  start.setDate(today.getDate() - today.getDay());
+        .welcome-popup h2 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 2em;
+            font-weight: 600;
+        }
 
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
+        .priority-form {
+            margin-top: 20px;
+        }
 
-    const div = document.createElement("div");
-    div.className = "day" + (d.toDateString() === today.toDateString() ? " today" : "");
-    div.textContent = d.toLocaleDateString("en-US", { weekday: "short" });
-    $("weekBar").appendChild(div);
-  }
-}
+        .priority-form textarea,
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #2a2a2a;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1em;
+            margin: 10px 0;
+            min-height: 100px;
+        }
 
-/* CALENDAR */
-function openCalendar() {
-  renderCalendar();
-  openModal("calendarModal");
-}
-function closeCalendar() {
-  closeModal("calendarModal");
-}
-function renderCalendar() {
-  const grid = $("calendarGrid");
-  const header = $("calendarHeader");
-  grid.innerHTML = "";
+        .priority-form textarea:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #fff;
+        }
 
-  const year = today.getFullYear();
-  const month = today.getMonth();
+        label {
+            color: #fff !important;
+        }
 
-  header.textContent = today.toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric"
-  });
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #2a2a2a;
+            outline: none;
+            -webkit-appearance: none;
+        }
 
-  const first = new Date(year, month, 1);
-  const last = new Date(year, month + 1, 0);
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+        }
 
-  for (let i = 0; i < first.getDay(); i++) {
-    grid.appendChild(document.createElement("div"));
-  }
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            border: none;
+        }
 
-  for (let d = 1; d <= last.getDate(); d++) {
-    const cell = document.createElement("div");
-    cell.textContent = d;
-    if (d === today.getDate()) cell.style.fontWeight = "bold";
-    grid.appendChild(cell);
-  }
-}
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
 
-/* INIT */
-window.onload = renderWeekBar;
-</script>
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
 
-</body>
+            .header-actions {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a2a;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a3a3a;
+        }
+    </style>
+    </head>
+    <body>
+          <!-- Welcome Popup -->
+    <div id="welcomeModal" class="modal active">
+        <div class="modal-content welcome-popup">
+            <span class="close" onclick="closeWelcome()">&times;</span>
+            <h2>📋 Welcome to Your Life Dashboard</h2>
+            <p style="font-size: 1.1em; color: #999; margin-bottom: 20px;">
+                Let's get started by setting your priorities for this week/month
+            </p>
+            <div class="priority-form">
+                <label style="display: block; text-align: left; font-weight: 600;">
+                    What are your top priorities right now?
+                </label>
+                <textarea id="priorities" placeholder="Example: Finish project report, exercise 3x/week, learn JavaScript basics..."></textarea>
+                <button class="btn" onclick="savePriorities()">Save & Start 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <div>
+                    <h1>Life Dashboard</h1>
+                    <p class="tagline">Track, Grow, Achieve</p>
+                </div>
+                <div class="header-actions">
+                    <span class="user-greeting" id="userGreeting"></span>
+                    <button onclick="window.location.href='login.html?profile'" class="btn btn-secondary">Profile</button>
+                    <button onclick="logout()" class="btn btn-logout">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Cards -->
+        <div class="grid">
+            <div class="card" onclick="openSection('goals')">
+                <h2><span class="card-icon">🎯</span> Goals</h2>
+                <p>Short and long-term goals with milestones</p>
+            </div>
+
+            <div class="card" onclick="openSection('habits')">
+                <h2><span class="card-icon">✓</span> Daily Habits</h2>
+                <p>Track daily habits with visual progress</p>
+            </div>
+
+            <div class="card" onclick="openSection('todo')">
+                <h2><span class="card-icon">📋</span> To-Do</h2>
+                <p>Daily tasks with progress tracking</p>
+            </div>
+
+            <div class="card" onclick="openSection('projects')">
+                <h2><span class="card-icon">📊</span> Projects</h2>
+                <p>Track progress with calendar integration</p>
+            </div>
+
+            <div class="card" onclick="openSection('finances')">
+                <h2><span class="card-icon">💰</span> Finances</h2>
+                <p>Budget tracker and savings goals</p>
+            </div>
+
+            <div class="card" onclick="openSection('meal')">
+                <h2><span class="card-icon">🍽</span> Meals</h2>
+                <p>Weekly meal planning and prep</p>
+            </div>
+
+            <div class="card" onclick="openSection('reflection')">
+                <h2><span class="card-icon">📝</span> Weekly Reflection</h2>
+                <p>Track your emotional journey over time</p>
+            </div>
+
+            <div class="card" onclick="openSection('monthly')">
+                <h2><span class="card-icon">📅</span> Monthly Review</h2>
+                <p>Set new goals and review accomplishments</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+
+        // Show user greeting
+        const userName = localStorage.getItem('userName') || 'User';
+        const greeting = document.getElementById('userGreeting');
+        if (greeting) {
+            greeting.textContent = `Hi, ${userName}`;
+        }
+
+        function logout() {
+            showCustomConfirm(
+                'Are you sure you want to logout?',
+                () => {
+                    localStorage.removeItem('isLoggedIn');
+                    window.location.href = 'login.html';
+                }
+            );
+        }
+
+        // Custom Alert Modal
+        function showCustomAlert(message) {
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 400px; text-align: center;">
+                    <p style="color: #e0e0e0; line-height: 1.6; white-space: pre-line; margin-bottom: 25px;">${message}</p>
+                    <button class="btn" onclick="this.closest('.modal').remove()" style="width: 100%;">OK</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Custom Confirm Modal
+        function showCustomConfirm(message, onConfirm) {
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 400px; text-align: center;">
+                    <p style="color: #e0e0e0; line-height: 1.6; white-space: pre-line; margin-bottom: 25px;">${message}</p>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="this.closest('.modal').remove()" style="flex: 1;">Cancel</button>
+                        <button class="btn" onclick="handleConfirm()" style="flex: 1;">Confirm</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            window.handleConfirm = () => {
+                modal.remove();
+                onConfirm();
+            };
+        }
+
+        function checkDailyCheckIn() {
+            const lastCheckIn = localStorage.getItem('lastCheckIn');
+            const today = new Date().toDateString();
+            
+            if (lastCheckIn !== today) {
+                showDailyCheckIn();
+            } else {
+                closeWelcome();
+            }
+        }
+
+        function showDailyCheckIn() {
+            const modal = document.getElementById('welcomeModal');
+            const content = modal.querySelector('.modal-content');
+            content.innerHTML = `
+                <span class="close" onclick="closeWelcome()">&times;</span>
+                <div class="welcome-popup">
+                    <h2>Daily Check-In</h2>
+                    <p style="font-size: 1em; color: #999; margin-bottom: 30px;">
+                        How are you feeling today?
+                    </p>
+                    <div style="text-align: left;">
+                        <div style="margin: 20px 0;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 10px;">
+                                😊 Mood (1-10)
+                            </label>
+                            <input type="range" id="mood" min="1" max="10" value="5" 
+                                   style="width: 100%;" oninput="updateSliderValue('mood', this.value)">
+                            <span id="moodValue" style="color: #fff; font-weight: 600;">5</span>
+                        </div>
+                        
+                        <div style="margin: 20px 0;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 10px;">
+                                ⚡ Energy Level (1-10)
+                            </label>
+                            <input type="range" id="energy" min="1" max="10" value="5" 
+                                   style="width: 100%;" oninput="updateSliderValue('energy', this.value)">
+                            <span id="energyValue" style="color: #fff; font-weight: 600;">5</span>
+                        </div>
+                        
+                        <div style="margin: 20px 0;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 10px;">
+                                ⏰ Available Time Today (1-10)
+                            </label>
+                            <input type="range" id="time" min="1" max="10" value="5" 
+                                   style="width: 100%;" oninput="updateSliderValue('time', this.value)">
+                            <span id="timeValue" style="color: #fff; font-weight: 600;">5</span>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="processDailyCheckIn()">Submit Check-In</button>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        function updateSliderValue(id, value) {
+            document.getElementById(id + 'Value').textContent = value;
+        }
+
+        function processDailyCheckIn() {
+            const mood = parseInt(document.getElementById('mood').value);
+            const energy = parseInt(document.getElementById('energy').value);
+            const time = parseInt(document.getElementById('time').value);
+            
+            localStorage.setItem('lastCheckIn', new Date().toDateString());
+            
+            const checkIns = JSON.parse(localStorage.getItem('checkInHistory') || '[]');
+            checkIns.push({
+                date: new Date().toISOString(),
+                mood: mood,
+                energy: energy,
+                time: time
+            });
+            localStorage.setItem('checkInHistory', JSON.stringify(checkIns));
+            
+            let message = '';
+            
+            if (time <= 3) {
+                message = `⚠️ **You're feeling pressed for time today!**\n\nMood: ${mood}/10 | Energy: ${energy}/10 | Time: ${time}/10\n\nIt looks like you might be too busy for most things. Let's lighten your load.`;
+                showTaskRemovalPrompt(message);
+                return;
+            } else if (energy <= 3 && mood <= 4) {
+                message = `🌿 **Take it easy today!**\n\nMood: ${mood}/10 | Energy: ${energy}/10 | Time: ${time}/10\n\nYou're feeling low on energy and mood. Consider a chill, restorative day. Focus on self-care and easy wins.`;
+            } else if (energy >= 8 && mood >= 7) {
+                message = `🔥 **You're fired up today!**\n\nMood: ${mood}/10 | Energy: ${energy}/10 | Time: ${time}/10\n\nGreat energy and mood! This is a perfect day to tackle challenging tasks and push yourself. Go all out!`;
+            } else if (energy <= 5 && time >= 7) {
+                message = `⚖️ **Pace yourself today**\n\nMood: ${mood}/10 | Energy: ${energy}/10 | Time: ${time}/10\n\nYou have time but lower energy. Focus on steady, manageable tasks. Don't overcommit.`;
+            } else {
+                message = `✨ **A balanced day ahead**\n\nMood: ${mood}/10 | Energy: ${energy}/10 | Time: ${time}/10\n\nYou're in a good middle ground. Tackle your priorities with a balanced approach.`;
+            }
+            
+            showCustomAlert(message);
+            closeWelcome();
+        }
+
+        function showTaskRemovalPrompt(previousMessage) {
+            const modal = document.getElementById('welcomeModal');
+            const content = modal.querySelector('.modal-content');
+            content.innerHTML = `
+                <span class="close" onclick="closeWelcome()">&times;</span>
+                <div class="welcome-popup" style="text-align: left;">
+                    <h2 style="text-align: center;">Too Busy Today</h2>
+                    <p style="color: #999; margin-bottom: 20px; text-align: center;">
+                        Let's remove some tasks from your to-do list
+                    </p>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 10px;">
+                            What tasks are you removing today?
+                        </label>
+                        <textarea id="removedTasks" 
+                                  placeholder="Example: Skip gym session, postpone project review..." 
+                                  style="width: 100%; padding: 15px; border: 1px solid #2a2a2a; background: #0a0a0a; color: #e0e0e0; border-radius: 6px; font-family: inherit; min-height: 80px; margin-bottom: 15px;"></textarea>
+                        
+                        <label style="display: block; font-weight: 600; margin-bottom: 10px;">
+                            Why are you removing these? (Be honest with yourself)
+                        </label>
+                        <textarea id="removalReasons" 
+                                  placeholder="Example: Not enough time, too tired, not a priority right now..." 
+                                  style="width: 100%; padding: 15px; border: 1px solid #2a2a2a; background: #0a0a0a; color: #e0e0e0; border-radius: 6px; font-family: inherit; min-height: 100px;"></textarea>
+                    </div>
+                    <button class="btn" onclick="saveTaskRemoval()">Save & Continue</button>
+                    <p style="margin-top: 15px; font-size: 0.85em; color: #666; text-align: center;">
+                        You'll review these excuses in your monthly summary
+                    </p>
+                </div>
+            `;
+        }
+
+        function saveTaskRemoval() {
+            const removedTasks = document.getElementById('removedTasks').value;
+            const reasons = document.getElementById('removalReasons').value;
+            
+            if (removedTasks.trim() && reasons.trim()) {
+                const excuses = JSON.parse(localStorage.getItem('taskExcuses') || '[]');
+                excuses.push({
+                    date: new Date().toISOString(),
+                    tasks: removedTasks,
+                    reasons: reasons
+                });
+                localStorage.setItem('taskExcuses', JSON.stringify(excuses));
+                
+                showCustomAlert('✅ Tasks removed and reasons saved.\n\n📅 Remember: You\'ll review these in your monthly summary to see if these excuses are worth it!');
+                closeWelcome();
+            } else {
+                showCustomAlert('Please fill in both fields to continue.');
+            }
+        }
+
+        function closeWelcome() {
+            document.getElementById('welcomeModal').classList.remove('active');
+        }
+
+        function savePriorities() {
+            const priorities = document.getElementById('priorities').value;
+            if (priorities.trim()) {
+                localStorage.setItem('lastCheckIn', new Date().toDateString());
+                showCustomAlert('Priorities saved! Let\'s get started on your journey 🎉');
+                closeWelcome();
+            } else {
+                showCustomAlert('Please write at least one priority to get started!');
+            }
+        }
+
+        function openSection(section) {
+            if (section === 'monthly') {
+                showMonthlyReview();
+                return;
+            }
+            
+            // Navigate to actual pages
+            const pages = {
+                'goals': 'goals.html',
+                'habits': 'daily_habits.html',
+                'todo': 'todo.html',
+                'projects': 'projects.html',
+                'finances': 'finances.html',
+                'meal': 'meals.html',
+                'reflection': 'reflection.html'
+            };
+            
+            if (pages[section]) {
+                window.location.href = pages[section];
+            }
+        }
+
+        function showMonthlyReview() {
+            const excuses = JSON.parse(localStorage.getItem('taskExcuses') || '[]');
+            const modal = document.getElementById('welcomeModal');
+            const content = modal.querySelector('.modal-content');
+            
+            let excuseList = '';
+            if (excuses.length > 0) {
+                excuseList = '<h3 style="color: #fff; margin-top: 30px; font-weight: 600;">Your Excuses This Month</h3>';
+                excuseList += '<p style="color: #999; margin-bottom: 15px;">Review these and ask yourself: Were they worth it?</p>';
+                excuses.forEach((excuse, index) => {
+                    const date = new Date(excuse.date).toLocaleDateString();
+                    excuseList += `
+                        <div style="background: #0a0a0a; padding: 15px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #fff;">
+                            <strong style="color: #fff;">${date}</strong>
+                            <p style="margin: 5px 0; color: #e0e0e0;"><strong>Removed:</strong> ${excuse.tasks}</p>
+                            <p style="margin: 5px 0; color: #e0e0e0;"><strong>Reason:</strong> ${excuse.reasons}</p>
+                        </div>
+                    `;
+                });
+                excuseList += '<p style="color: #666; font-size: 0.85em; margin-top: 15px;">Reflect: Are these patterns you want to keep? What needs to change?</p>';
+            } else {
+                excuseList = '<p style="color: #999; margin-top: 20px;">No task removals recorded this month. Great consistency!</p>';
+            }
+            
+            content.innerHTML = `
+                <span class="close" onclick="closeWelcome()">&times;</span>
+                <div style="text-align: left;">
+                    <h2 style="color: #fff; text-align: center; font-weight: 600;">Monthly Review</h2>
+                    <p style="color: #999; margin-bottom: 20px; text-align: center;">
+                        Time to reflect on your month and set new goals
+                    </p>
+                    ${excuseList}
+                    <div style="margin-top: 30px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 10px;">
+                            New Daily Goals for Next Month
+                        </label>
+                        <textarea id="newGoals" 
+                                  placeholder="What do you want to achieve daily next month?" 
+                                  style="width: 100%; padding: 15px; border: 1px solid #2a2a2a; background: #0a0a0a; color: #e0e0e0; border-radius: 6px; font-family: inherit; min-height: 100px; margin-bottom: 15px;"></textarea>
+                        
+                        <label style="display: block; font-weight: 600; margin-bottom: 10px;">
+                            Rewrite Your Life Values
+                        </label>
+                        <textarea id="lifeValues" 
+                                  placeholder="What matters most to you? What do you want to prioritize?" 
+                                  style="width: 100%; padding: 15px; border: 1px solid #2a2a2a; background: #0a0a0a; color: #e0e0e0; border-radius: 6px; font-family: inherit; min-height: 100px;"></textarea>
+                    </div>
+                    <button class="btn" onclick="saveMonthlyReview()">Save Monthly Review</button>
+                    <button class="btn btn-secondary" onclick="clearExcuses()" style="margin-left: 10px;">Clear Old Excuses</button>
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        function saveMonthlyReview() {
+            const newGoals = document.getElementById('newGoals').value;
+            const lifeValues = document.getElementById('lifeValues').value;
+            
+            if (newGoals.trim() && lifeValues.trim()) {
+                const reviews = JSON.parse(localStorage.getItem('monthlyReviews') || '[]');
+                reviews.push({
+                    date: new Date().toISOString(),
+                    goals: newGoals,
+                    values: lifeValues
+                });
+                localStorage.setItem('monthlyReviews', JSON.stringify(reviews));
+                
+                showCustomAlert('✅ Monthly review saved! Your new goals and values are set for next month.');
+                closeWelcome();
+            } else {
+                showCustomAlert('Please fill in both fields to complete your monthly review.');
+            }
+        }
+
+        function clearExcuses() {
+            showCustomConfirm(
+                'Are you sure you want to clear your excuse history? This cannot be undone.',
+                () => {
+                    localStorage.setItem('taskExcuses', '[]');
+                    showCustomAlert('✅ Excuse history cleared. Fresh start!');
+                    showMonthlyReview();
+                }
+            );
+        }
+
+        window.onload = function() {
+            checkDailyCheckIn();
+        }
+    </script>
+    </body>
 </html>
